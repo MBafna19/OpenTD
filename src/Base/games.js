@@ -1,16 +1,26 @@
 const Players = require('./players.js')
+const mongoose = require('mongoose')
+
+const url = 'mongodb+srv://mihir:mihir@cluster0.rf8u5.mongodb.net/Tournament?retryWrites=true&w=majority';
+const connectionParams={
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true 
+}
 
 let games = []
 
 //player1 is white, player 2 is black
-exports.game_init = (player1, player2, round) => {
+exports.game_init = (player1, player2, round, connection) => {
   let currGame = {
     id_white: player1.id,
     id_black: player2.id,
     round: round,
     result : 'n'
   }
-
+  
+  connection.Games.insert(currGame)
+  
   games.push(currGame)
   player1.played[round] = currGame
   player1.color++
@@ -23,12 +33,9 @@ exports.game_init = (player1, player2, round) => {
 exports.game_result = (game, result, players) => {
   game.result = result
   if(result ==='w'){
-    //console.log(players.length)
     for(let i = 0; i < players.length; i++){
-      //console.log(players[i].id)
       if(players[i].id == game.id_white){
         players[i].points += 1.0
-        //console.log(players[i].firstName)
       }
     }
   }
